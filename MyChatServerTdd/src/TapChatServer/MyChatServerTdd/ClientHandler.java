@@ -1,4 +1,4 @@
-package main.TapChatServer.MyChatServerTdd;
+package TapChatServer.MyChatServerTdd;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,20 +10,26 @@ public class ClientHandler {
 	private Socket client;
 	private InputStream in;
 	private OutputStream out;
+	private FactoryHttpCommand factory;
+	private int loginStatus;
+	private Database db;
 
-	public ClientHandler(Socket client) throws IOException{
+	public ClientHandler(Socket client,Database db) throws IOException{
 		this.client = client;
 		in = client.getInputStream();
 		out = client.getOutputStream();
+		this.factory = new FactoryHttpCommand();
+		this.db = db;
+		this.loginStatus = 0;
 	}
 
 	public Socket getSocket() {
 		return this.client;
 	}
 
-	public String getCommand() throws IOException {
+	public String getAnsware() throws IOException {
 		StringBuilder sb = new StringBuilder();
-		String response ="";
+		String response ="KO\r\n";
 		int byteRead;
 		while((byteRead = in.read()) != -1){
 			char ch = (char) byteRead;
@@ -42,9 +48,22 @@ public class ClientHandler {
 		return response;
 	}
 
-	private String execute(String string) {
+	public Database getDb(){
+		return db;
 		
-		return "KO\r\n";
+	}
+	private String execute(String string) {
+		IHttpProtocol command = factory.getCmd(string, 0);
+		String Result = command.execute(this);
+		return Result;
 	}
 	
+	public void setLoginStatus(int status){
+		this.loginStatus = status;
+	}
+
+	public int getLoginStatus() {
+		return this.loginStatus;
+	}
+
 }
