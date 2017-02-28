@@ -13,6 +13,7 @@ public class ClientHandler {
 	private FactoryHttpCommand factory;
 	private int loginStatus;
 	private Database db;
+	protected String userName;
 
 	public ClientHandler(Socket client,Database db) throws IOException{
 		this.client = client;
@@ -21,6 +22,7 @@ public class ClientHandler {
 		this.factory = new FactoryHttpCommand();
 		this.db = db;
 		this.loginStatus = 0;
+		userName = "";
 	}
 
 	public Socket getSocket() {
@@ -53,9 +55,8 @@ public class ClientHandler {
 		
 	}
 	private String execute(String string) {
-		IHttpProtocol command = factory.getCmd(string, 0);
-		String Result = command.execute(this);
-		return Result;
+		IHttpProtocol command = this.factory.getCmd(string, this.loginStatus);
+		return command.execute(this);
 	}
 	
 	public void setLoginStatus(int status){
@@ -64,6 +65,11 @@ public class ClientHandler {
 
 	public int getLoginStatus() {
 		return this.loginStatus;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+		
 	}
 
 }

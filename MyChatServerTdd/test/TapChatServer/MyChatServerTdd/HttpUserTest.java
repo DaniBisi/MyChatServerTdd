@@ -34,9 +34,11 @@ public class HttpUserTest extends TestCase {
 	}
 	@Test
 	public void testExecute(){
-		h1 = new HttpUser();
+		String[] userName = {"dani"};
+		h1 = new HttpUser(userName);
 		h1.execute(c1);
 		verify(c1).setLoginStatus(1);
+		verify(c1).setUserName(userName[0]);
 	}
 	
 }

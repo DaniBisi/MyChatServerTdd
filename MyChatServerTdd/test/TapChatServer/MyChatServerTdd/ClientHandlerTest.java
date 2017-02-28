@@ -22,8 +22,6 @@ import junit.framework.TestCase;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ClientHandlerTest extends TestCase {
-	
-
 	private HttpUser cmd;
 	private InputStream in;
 	private OutputStream out;
@@ -32,8 +30,8 @@ public class ClientHandlerTest extends TestCase {
 	private Socket client;
 	@Mock
 	private Database Db;	
-//	@Mock
-//	private FactoryHttpCommand factory;
+	@Mock
+	private FactoryHttpCommand factory;
 	
 
 	@InjectMocks
@@ -49,10 +47,10 @@ public class ClientHandlerTest extends TestCase {
 		in = mock(InputStream.class);
 		out = mock(OutputStream.class);
 		cmd = mock(HttpUser.class);
-		when(client.getInputStream()).thenReturn(in);
-		when(client.getOutputStream()).thenReturn(out);
-		when(cmd.execute(c1)).thenReturn("OK\r\n");
-		//when(factory.getCmd()).thenReturn(cmd);
+//		when(client.getInputStream()).thenReturn(in);
+//		when(client.getOutputStream()).thenReturn(out);
+		//when(cmd.execute(c1)).thenReturn("OK\r\n");
+		when(factory.getCmd("USER\r\n",0)).thenReturn(cmd);
 	}
 
 	@After
@@ -93,6 +91,7 @@ public class ClientHandlerTest extends TestCase {
 		String response = c1.getAnsware();
 		assertEquals("OK\r\n", response);
 	}
+	
 	@Test 
 	public void testUnexpectedEndOfStream() throws IOException{
 		when(in.read()).thenReturn(85, -1);
@@ -100,9 +99,40 @@ public class ClientHandlerTest extends TestCase {
 		String response = c1.getAnsware();
 		assertEquals("KO\r\n", response);
 	}
-	
+	@Test
 	public void testSetLoginStatus(){
 		c1.setLoginStatus(2);
 		assertEquals(2, c1.getLoginStatus());
+	}
+	
+	/*
+	@Test
+	public void testExecuteValidPassCommand() throws IOException{
+		when(in.read()).thenReturn(80, 65, 83, 83 ,13,10,-1);
+        MockitoAnnotations.initMocks(this);
+        c1.setLoginStatus(1);
+		String response = c1.getAnsware();
+		assertEquals("OK\r\n", response);
+	}
+	@Test 
+	public void testExecuteValidUser() throws IOException{
+		//int[] msg= convert("ciao");
+		when(in.read()).thenReturn(85, 83, 69, 82, 32, 100, 97, 110, 105,13,10,-1); //USER dani\r\r
+        MockitoAnnotations.initMocks(this);
+		String response = c1.getAnsware();
+		assertEquals("dani", c1.userName);
+		assertEquals("OK\r\n", response);
+	}*/
+	
+	public int[] convert(String str) {
+	    int[] result = new int[str.length()+3];
+	    int i;
+	    for (i = 0; i < str.length(); i++) {
+	        result[i] = str.charAt(i);
+	    }
+	    result[1+1]=13;
+	    result[1+2]=10;
+	    result[1+3]=-1;
+	    return result;
 	}
 }
